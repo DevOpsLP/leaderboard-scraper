@@ -1,6 +1,6 @@
 # Binance Leaderboard Express API
 
-The main idea of this project is be able to scrape the data from the leaderboard profile you want and return the data. This is meant to be deployed on a VPS so it can later called to obtain the data for a `Google Sheet via App Scripts` but can serve any other purposes
+The main idea of this project is be able to scrape the data from the leaderboard profile you want and return the data. This is meant to be deployed on a VPS so it can later be called to obtain the data for a `Google Sheet via App Scripts` but can serve any other purposes.
 
 ## Table of Contents
 
@@ -100,7 +100,21 @@ This endpoint retrieves leaderboard data from Binance using the headers saved by
 
 **Responses**
 
-- `200 OK`: Returns the leaderboard data.
+- `200 OK`: Returns the leaderboard data, including:
+  ```json
+  {
+    "dailyROI": "<value>",
+    "dailyPNL": "<value>",
+    "weeklyROI": "<value>",
+    "weeklyPNL": "<value>",
+    "monthlyROI": "<value>",
+    "monthlyPNL": "<value>",
+    "totalPNL": "<value>",
+    "openPositions": <number>,
+    "openLongPositions": <number>,
+    "openShortPositions": <number>
+  }
+  ```
 - `400 Bad Request`: URL is required or `encryptedUid` not found.
 - `403 Forbidden`: Please update your credentials.
 - `404 Not Found`: Headers have not been set.
@@ -111,15 +125,17 @@ This endpoint retrieves leaderboard data from Binance using the headers saved by
 ### Using Curl
 
 **Setting Headers**:
-
 ```sh
 curl -X POST http://localhost:3000/setHeaders \
      -H "Content-Type: text/plain" \
-     --data-binary @headers.txt
+     --data 'Referer: https://www.binance.com 
+     device-info: eyJzY3JlZW5fcm
+     bnc-uuid: 90477ad1-9
+     Cache-Control: no-cache
+     Cookie: OptanonConsent=isGpcEnabled=0'
 ```
 
 Where `headers.txt` contains:
-
 ```
 Referer: https://www.binance.com/en/futures-activity/leaderboard/user/um?encryptedUid=...
 Cache-Control: no-cache
@@ -128,7 +144,6 @@ User-Agent: Mozilla/5.0 ...
 ```
 
 **Fetching Leaderboard Info**:
-
 ```sh
 curl -X POST http://localhost:3000/leaderboard-info \
      -H "Content-Type: application/json" \
@@ -140,14 +155,12 @@ curl -X POST http://localhost:3000/leaderboard-info \
 ### Using Postman
 
 **Set Headers**:
-
 1. Set the method to `POST`.
 2. URL: `http://localhost:3000/setHeaders`.
 3. Headers: Set `Content-Type` to `text/plain`.
 4. Body: Select `raw` and paste your headers in plain text.
 
 **Fetch Leaderboard Info**:
-
 1. Set the method to `POST`.
 2. URL: `http://localhost:3000/leaderboard-info`.
 3. Headers: Set `Content-Type` to `application/json`.
@@ -167,27 +180,15 @@ curl -X POST http://localhost:3000/leaderboard-info \
 
 ## Development Notes
 
-- **Headers File (********`headers.json`********\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*)**: This file stores headers set via `/setHeaders`. It is important to secure this file as it may contain sensitive information.
+- **Headers File (`headers.json`)**: This file stores headers set via `/setHeaders`. It is important to secure this file as it may contain sensitive information.
 
 - **Environment Setup**:
-
   - The server listens on `PORT 3000` by default. To configure a different port, use the `PORT` environment variable.
   - Make sure Node.js and npm are installed on your system.
-
-## Security Considerations
-
-- **Headers Management**: Be cautious while managing sensitive information such as cookies, tokens, and session IDs within `headers.json`. Ensure proper file permissions and restrict access to authorized personnel only.
-- **HTTPS**: Use HTTPS for all communications to prevent man-in-the-middle attacks that could expose headers.
-- **Access Control**: Ensure that only authorized clients can set or modify headers to prevent potential misuse.
-
-## Conclusion
-
-This Express API offers a convenient way to manage custom headers and make requests to the Binance Futures Leaderboard. The `/setHeaders` endpoint allows users to configure headers once and reuse them across multiple leaderboard queries.
 
 **Usage Flow**:
 
 1. Set your headers using `/setHeaders`.
 2. Fetch leaderboard information using `/leaderboard-info`.
 
-By separating header management from API requests, the application offers a clean and reusable architecture for interacting with external services that require complex headers.
 
