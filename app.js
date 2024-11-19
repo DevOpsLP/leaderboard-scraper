@@ -97,13 +97,13 @@ app.post('/leaderboard-info', (req, res) => {
         ...options,
         url: 'https://www.binance.com/bapi/futures/v2/private/future/leaderboard/getOtherPosition',
       });
-
+      console.log("Position response", positionResponse.data);
       // Make the second API call to get performance
       const performanceResponse = await axios.request({
         ...options,
         url: 'https://www.binance.com/bapi/futures/v2/public/future/leaderboard/getOtherPerformance',
       });
-
+      console.log("Perfomance response: ", performanceResponse.data);
       // Make the third API call to get nickName
       const baseInfoOptions = {
         method: 'POST',
@@ -117,7 +117,7 @@ app.post('/leaderboard-info', (req, res) => {
         ...baseInfoOptions,
         url: 'https://www.binance.com/bapi/futures/v2/public/future/leaderboard/getOtherLeaderboardBaseInfo',
       });
-
+      console.log("Base Info: ", baseInfoResponse.data);
       // Extract nickName from baseInfoResponse
       const baseInfoData = baseInfoResponse.data.data;
       const nickName = baseInfoData.nickName || null;
