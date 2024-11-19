@@ -42,7 +42,6 @@ app.post('/setHeaders', (req, res) => {
 
 
 // Endpoint to get leaderboard info
-// Endpoint to get leaderboard info
 app.post('/leaderboard-info', (req, res) => {
   const url = req.body.url;
 
@@ -105,6 +104,24 @@ app.post('/leaderboard-info', (req, res) => {
         url: 'https://www.binance.com/bapi/futures/v2/public/future/leaderboard/getOtherPerformance',
       });
 
+      // Make the third API call to get nickName
+      const baseInfoOptions = {
+        method: 'POST',
+        headers: headers,
+        data: {
+          encryptedUid: encryptedUid,
+        },
+      };
+
+      const baseInfoResponse = await axios.request({
+        ...baseInfoOptions,
+        url: 'https://www.binance.com/bapi/futures/v2/public/future/leaderboard/getOtherLeaderboardBaseInfo',
+      });
+
+      // Extract nickName from baseInfoResponse
+      const baseInfoData = baseInfoResponse.data.data;
+      const nickName = baseInfoData.nickName || null;
+
       // Process position data
       const positionsData = positionResponse.data.data;
       const otherPositionRetList = positionsData.otherPositionRetList || [];
@@ -164,8 +181,9 @@ app.post('/leaderboard-info', (req, res) => {
         }
       }
 
-      // Prepare the response data, including the Positions array
+      // Prepare the response data, including the Positions array and username
       const responseData = {
+        username: nickName, // Include the nickName as username
         dailyROI,
         dailyPNL,
         weeklyROI,
@@ -190,6 +208,7 @@ app.post('/leaderboard-info', (req, res) => {
     }
   });
 });
+
 
 
 // Start the server
